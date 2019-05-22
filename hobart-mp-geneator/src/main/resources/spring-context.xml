@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+    <!-- 配置数据源 -->
+    <context:property-placeholder location="classpath:jdbc.properties"/>
+    
+    <!--德鲁伊-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}" />
+
+        <!-- 基本属性 url、user、password -->
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.user}" />
+        <property name="password" value="${jdbc.password}" />
+
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="1" />
+        <property name="minIdle" value="1" />
+        <property name="maxActive" value="10" />
+
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat" />
+    </bean>
+
+    <!--事物管理器-->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <!--基于注解事物-->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager" />
+
+
+    <!-- sqlSessionFactoryBean
+        mybatis提供的：org.mybatis.spring.SqlSessionFactoryBean
+        MP提供的：com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean
+        整合MP只要替换就行
+     -->
+    <bean id="sqlSessionFactoryBean" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="dataSource" ref="dataSource"/>
+        <!--别名处理-->
+        <property name="typeAliasesPackage" value="com.hobart.mp.model"></property>
+        
+        <!--全局策略配置-->
+        <property name="globalConfig" ref="globalConfig" />
+    </bean>
+    
+    <!--mybatis-plus全局配置 -->
+    <bean id="globalConfig" class="com.baomidou.mybatisplus.entity.GlobalConfiguration">
+        <!--驼峰命名 2.3版本后默认值是true-->
+        <property name="dbColumnUnderline" value="true" />
+        <!--
+            AUTO->`0`("数据库ID自增")
+             INPUT->`1`(用户输入ID")
+            ID_WORKER->`2`("全局唯一ID")
+            UUID->`3`("全局唯一ID")
+        -->
+        <!--全局主键策略-->
+        <property name="idType" value="0"></property>
+        <!--
+            MYSQL->`mysql`
+            ORACLE->`oracle`
+            DB2->`db2`
+            H2->`h2`
+            HSQL->`hsql`
+            SQLITE->`sqlite`
+            POSTGRE->`postgresql`
+            SQLSERVER2005->`sqlserver2005`
+            SQLSERVER->`sqlserver`
+        -->
+        <!-- Oracle需要添加该项 -->
+        <!-- <property name="dbType" value="oracle" /> -->
+        
+        <!--表前缀-->
+        <property name="tablePrefix" value="t_hb_" />
+    </bean>
+    
+    
+    <!--  配置mybatis扫描mapper接口路劲-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.hobart.mp.mapper"/>
+    </bean>
+
+    
+</beans>

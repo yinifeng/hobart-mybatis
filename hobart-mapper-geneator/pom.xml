@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.hobart.cmapper</groupId>
+    <artifactId>hobart-mapper-geneator</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <description>通用mapper代码生成器</description>
+
+    <properties>
+        <!--Java接口和实体类-->
+        <!--源码路劲-->
+        <targetJavaProject>${basedir}/src/main/java</targetJavaProject>
+        <!--MBG生成XxxMapper接口后存放的package位置-->
+        <targetMapperPackage>com.hobart.mbg.mapper</targetMapperPackage>
+        <!--MBG生成实体类存放的package位置-->
+        <targetModelPackage>com.hobart.mbg.model</targetModelPackage>
+        <!--声明存放资源文件和XML配置文件的目录位置-->
+        <targetResourcesProject>${basedir}/src/main/resources</targetResourcesProject>
+        <!--声明存放具体XxxMapper.xml文件的目录位置-->
+        <targetXMLPackage>mapper</targetXMLPackage>
+        
+        <jdk.version>1.8</jdk.version>
+        <spring.version>4.3.22.RELEASE</spring.version>
+        <tk.mybatis.version>4.1.5</tk.mybatis.version>
+        <mybatis.version>3.4.6</mybatis.version>
+        <mybatis.spring.version>1.3.2</mybatis.spring.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
+        <junit.version>4.12</junit.version>
+        <mysql.version>5.1.47</mysql.version>
+        <druid.version>1.1.16</druid.version>
+        <cglib.version>3.1</cglib.version>
+        <aspectjweaver.version>1.8.13</aspectjweaver.version>
+    </properties>
+    
+    <dependencies>
+        <!--通用mapper-->
+        <dependency>
+            <groupId>tk.mybatis</groupId>
+            <artifactId>mapper</artifactId>
+            <version>${tk.mybatis.version}</version>
+        </dependency>
+
+        <!--mybatis-->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>${mybatis.version}</version>
+        </dependency>
+
+        <!-- Mybatis Generator -->
+        <dependency>
+            <groupId>org.mybatis.generator</groupId>
+            <artifactId>mybatis-generator-core</artifactId>
+            <version>1.3.6</version>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+    <!--配置阿里云仓库-->
+    <repositories>
+        <repository>
+            <id>maven-ali</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public//</url>
+            <layout>default</layout>
+            <!-- 是否开启发布版构件下载 -->
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <!-- 是否开启快照版构件下载 -->
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    
+    <build>
+
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.mybatis.generator</groupId>
+                <artifactId>mybatis-generator-maven-plugin</artifactId>
+                <version>1.3.6</version>
+                <!--generatorConfig.xml配置文件路劲-->
+                <configuration>
+                    <configurationFile>
+                        ${basedir}/src/main/resources/generator/generatorConfig.xml
+                    </configurationFile>
+                    <overwrite>true</overwrite>
+                    <verbose>true</verbose>
+                </configuration>
+                <!--MBG插件依赖信息-->
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>${mysql.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>tk.mybatis</groupId>
+                        <artifactId>mapper</artifactId>
+                        <version>${tk.mybatis.version}</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+</project>
